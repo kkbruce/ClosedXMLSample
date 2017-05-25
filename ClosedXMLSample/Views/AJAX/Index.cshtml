@@ -1,0 +1,32 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>AJAX - Get Export Excel</h2>
+
+
+
+@section js
+{
+    <script type="text/javascript">
+        $(function() {
+            $("#exportExcel").click(function() {
+                var number = parseInt($("#number").text());
+
+                $.ajax({
+                    method: "Post",
+                    url: "@Url.Action("ExportExcel", "AJAX")",
+                    data: { numberId: number },
+                    dataType: "html"
+                }).success(function (data) {
+                    var response = JSON.parse(data);
+                    if (response.downloadId != null || response.downloadId !== "") {
+                        window.location.href = '@Url.Action("ExportExcel", "AJAX")?downloadId=' + response.downloadId;
+                    }
+                });
+
+            });
+        });
+    </script>
+}
