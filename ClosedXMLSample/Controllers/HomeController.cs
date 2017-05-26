@@ -1017,6 +1017,10 @@ namespace ClosedXMLSample.Controllers
             return ExportExcel(wb, "HideWorksheets");
         }
 
+        /// <summary>
+        /// https://github.com/ClosedXML/ClosedXML/wiki/Sheet-Protection
+        /// </summary>
+        /// <returns></returns>
         public ActionResult SheetProtection()
         {
             GetInstance("Protected No-Password", out XLWorkbook wb, out IXLWorksheet ws);
@@ -1059,6 +1063,28 @@ namespace ClosedXMLSample.Controllers
             protection.InsertColumns = true;
 
             return ExportExcel(wb, "SheetProtection");
+        }
+
+        /// <summary>
+        /// https://github.com/ClosedXML/ClosedXML/wiki/Tab-Colors
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult TabColors()
+        {
+            GetInstance("Red", out XLWorkbook wb, out IXLWorksheet ws);
+
+            ws.SetTabColor(XLColor.Red);
+
+            var wsAccent3 = wb.Worksheets.Add("Accent3");
+            wsAccent3.SetTabColor(XLColor.FromTheme(XLThemeColor.Accent3));
+
+            var wsIndexed = wb.Worksheets.Add("Indexed");
+            wsIndexed.TabColor = XLColor.FromIndex(24);
+
+            var wsArgb = wb.Worksheets.Add("Argb");
+            wsArgb.TabColor = XLColor.FromArgb(23, 23, 23);
+
+            return ExportExcel(wb, "TabColors");
         }
 
         /// <summary>
