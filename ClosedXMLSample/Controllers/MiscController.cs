@@ -852,5 +852,64 @@ namespace ClosedXMLSample.Controllers
             return ExportExcel(wb, "TabColors");
         }
 
+        public ActionResult ConditionalFormatting()
+        {
+            GetInstance("CF1", out XLWorkbook wb, out IXLWorksheet ws);
+
+            ws.FirstCell().SetValue(1)
+              .CellBelow().SetValue(1)
+              .CellBelow().SetValue(2)
+              .CellBelow().SetValue(3)
+              .CellBelow().SetValue(4);
+
+            // 加入格式條件
+            ws.RangeUsed().AddConditionalFormat()
+              .WhenBetween(2, 3)    // 當值介於 n.m
+              .Fill.SetBackgroundColor(XLColor.Red);
+
+            var ws2 = wb.AddWorksheet("CF2");
+
+            ws2.FirstCell().SetValue(1)
+               .CellBelow().SetValue(1)
+               .CellBelow().SetValue(2)
+               .CellBelow().SetValue(3)
+               .CellBelow().SetValue(4);
+
+            ws2.RangeUsed().AddConditionalFormat()
+               .ColorScale() // 使用色階條件
+               .LowestValue(XLColor.Red)        // 低
+               .Midpoint(XLCFContentType.Percent, 50, XLColor.Yellow) // 中
+               .HighestValue(XLColor.Green);    // 高
+
+            var ws3 = wb.AddWorksheet("CF3");
+
+            ws3.FirstCell().SetValue(1)
+               .CellBelow().SetValue(1)
+               .CellBelow().SetValue(2)
+               .CellBelow().SetValue(3)
+               .CellBelow().SetValue(4);
+
+
+            ws3.RangeUsed().AddConditionalFormat()
+               .IconSet(XLIconSetStyle.ThreeTrafficLights2)  // 使用圖示條件
+               .AddValue(XLCFIconSetOperator.EqualOrGreaterThan, 0, XLCFContentType.Number)
+               .AddValue(XLCFIconSetOperator.EqualOrGreaterThan, 2, XLCFContentType.Number)
+               .AddValue(XLCFIconSetOperator.EqualOrGreaterThan, 3, XLCFContentType.Number);
+
+            var ws4 = wb.AddWorksheet("CF4");
+
+            ws4.FirstCell().SetValue(1)
+               .CellBelow().SetValue(1)
+               .CellBelow().SetValue(2)
+               .CellBelow().SetValue(3)
+               .CellBelow().SetValue(4);
+
+            ws4.RangeUsed().AddConditionalFormat()
+               .DataBar(XLColor.Red)
+               .LowestValue()
+               .HighestValue();
+
+            return ExportExcel(wb, "ConditionalFormatting");
+        }
     }
 }
