@@ -918,6 +918,10 @@ namespace ClosedXMLSample.Controllers
             return ExportExcel(wb, "ConditionalFormatting");
         }
 
+        /// <summary>
+        /// https://github.com/closedxml/closedxml/wiki/Pivot-Table-example
+        /// </summary>
+        /// <returns></returns>
         public ActionResult PivotTable()
         {
             #region Fake Data
