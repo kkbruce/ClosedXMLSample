@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 using ClosedXML.Excel;
+using ClosedXMLSample.Models;
 
 namespace ClosedXMLSample.Controllers
 {
@@ -577,8 +579,8 @@ namespace ClosedXMLSample.Controllers
             // ws.SheetView.FreezeColumns(3);
 
             // 調整分割, 指定為 0 是移除
-            ws.SheetView.SplitRow = 2;
-            ws.SheetView.SplitColumn = 0;
+            //ws.SheetView.SplitRow = 2;
+            //ws.SheetView.SplitColumn = 0;
 
             return ExportExcel(wb, "FreezePanes");
         }
@@ -852,6 +854,10 @@ namespace ClosedXMLSample.Controllers
             return ExportExcel(wb, "TabColors");
         }
 
+        /// <summary>
+        /// https://github.com/closedxml/closedxml/wiki/Conditional-Formatting
+        /// </summary>
+        /// <returns></returns>
         public ActionResult ConditionalFormatting()
         {
             GetInstance("CF1", out XLWorkbook wb, out IXLWorksheet ws);
@@ -905,11 +911,75 @@ namespace ClosedXMLSample.Controllers
                .CellBelow().SetValue(4);
 
             ws4.RangeUsed().AddConditionalFormat()
-               .DataBar(XLColor.Red)
+               .DataBar(XLColor.Red) // 使用資料橫條
                .LowestValue()
                .HighestValue();
 
             return ExportExcel(wb, "ConditionalFormatting");
+        }
+
+        public ActionResult PivotTable()
+        {
+            #region Fake Data
+
+             var pastries = new List<Pastry>
+            {
+              new Pastry("Croissant", 150, "Apr"),
+              new Pastry("Croissant", 250, "May"),
+              new Pastry("Croissant", 134, "June"),
+              new Pastry("Doughnut", 250, "Apr"),
+              new Pastry("Doughnut", 225, "May"),
+              new Pastry("Doughnut", 210, "June"),
+              new Pastry("Bearclaw", 134, "Apr"),
+              new Pastry("Bearclaw", 184, "May"),
+              new Pastry("Bearclaw", 124, "June"),
+              new Pastry("Danish", 394, "Apr"),
+              new Pastry("Danish", 190, "May"),
+              new Pastry("Danish", 221, "June"),
+              new Pastry("Scone", 135, "Apr"),
+              new Pastry("Scone", 122, "May"),
+              new Pastry("Scone", 243, "June")
+            };
+
+            #endregion
+
+            GetInstance("PastrySalesData", out XLWorkbook wb, out IXLWorksheet ws);
+
+            // 在 Cell(1,1) 插入 pastries 資料到 "PastrySalesData" Worksheet
+            var source = ws.Cell(1, 1).InsertTable(pastries, "PastrySalesData", true);
+
+            var range = source.DataRange;       // 完整table範圍
+            var header = ws.Range(1, 1, 1, 3);  // 定義Header範圍
+            var dataRange = ws.Range(header.FirstCell(), range.LastCell()); // 定義資料範圍
+
+            var ptWs = wb.Worksheets.Add("PivotTable");
+
+            // 使用資料 dataRange 建立  pivot table
+            var pt = ptWs.PivotTables.AddNew("PivotTable", ptWs.Cell(1, 1), dataRange);
+
+            // 指定列標籤。
+            // 使用 pastries 的名稱指定。
+            pt.RowLabels.Add("Name");
+
+            // 指定欄標籤。
+            // 使用 pastries 的名稱指定。
+            pt.ColumnLabels.Add("Month");
+
+            // The values in our table will come from the "NumberOfOrders" field
+            // The default calculation setting is a total of each row/column
+            // 指定值。
+            // 使用 pastries 的名稱指定。
+            // 預設計算每一 row/column 的總計(total)
+            pt.Values.Add("NumberOfOrders");
+
+            return ExportExcel(wb, "PivotTable");
+        }
+
+        [NonAction]
+        public ActionResult CodeBase()
+        {
+            GetInstance("PastrySalesData", out XLWorkbook wb, out IXLWorksheet ws);
+            return ExportExcel(wb, "PivotTable");
         }
     }
 }
