@@ -965,20 +965,11 @@ namespace ClosedXMLSample.Controllers
             // 使用 pastries 的名稱指定。
             pt.ColumnLabels.Add("Month");
 
-            // The values in our table will come from the "NumberOfOrders" field
-            // The default calculation setting is a total of each row/column
             // 指定值。
             // 使用 pastries 的名稱指定。
             // 預設計算每一 row/column 的總計(total)
             pt.Values.Add("NumberOfOrders");
 
-            return ExportExcel(wb, "PivotTable");
-        }
-
-        [NonAction]
-        public ActionResult CodeBase()
-        {
-            GetInstance("PastrySalesData", out XLWorkbook wb, out IXLWorksheet ws);
             return ExportExcel(wb, "PivotTable");
         }
     }
